@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teka-Teki Pintar | Aplikasi dibuat oleh ALFIAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc; 
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at top left, rgba(79, 70, 229, 0.08), transparent 50%),
+                radial-gradient(circle at bottom right, rgba(147, 51, 234, 0.08), transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .card-main {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-help {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            color: #6366f1;
+            transition: all 0.2s;
+        }
+
+        .btn-help:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .input-clean {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .input-clean:focus {
+            background: #ffffff;
+            border-color: var(--accent-primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .feedback-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .correct-state { background: rgba(236, 253, 245, 0.98); }
+        .wrong-state { background: rgba(255, 241, 242, 0.98); }
+        .game-over-state { background: rgba(30, 41, 59, 0.95); color: white; }
+
+        .option-card {
+            background: #ffffff;
+            border: 2px solid #f1f5f9;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        .option-card.hidden-opt {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .timer-container {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 4px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-bar {
+            height: 6px;
+            background: linear-gradient(to right, #4f46e5, #9333ea);
+            width: 100%;
+            border-radius: 1rem;
+            transition: width 0.1s linear;
+        }
+
+        #timer-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+        }
+
+        .footer-branding {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+            width: 100%;
+        }
+
+        .dev-tag {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .music-anim {
+            animation: pulse-music 0.5s infinite;
+        }
+
+        @keyframes pulse-music {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="game-container" class="w-full max-w-[420px] px-6 h-full flex items-center justify-center relative">
+        
+        <!-- Layar Registrasi -->
+        <div id="reg-screen" class="card-main w-full min-h-[600px] rounded-[3rem] p-8 text-center animate-in fade-in zoom-in duration-500">
+            <div class="mb-8">
+                <img src="https://i.ibb.co.com/3yc5fBHZ/OIP.png" alt="Logo Pintar Logic" class="w-24 h-24 mx-auto mb-4 drop-shadow-xl">
+                <h1 class="text-3xl font-extrabold tracking-tight mb-1 text-slate-800">Pintar <span class="text-indigo-600">Logic</span></h1>
+                <p class="text-slate-500 text-sm font-medium">Uji Logika & Musik Semangat</p>
+            </div>
+            
+            <div class="space-y-5">
+                <div class="text-left">
+                    <label class="text-[11px] uppercase tracking-[0.15em] text-slate-400 font-bold ml-1 mb-2 block">Siapa namamu?</label>
+                    <input type="text" id="player-name" placeholder="Ketik namamu..." maxlength="12" autocomplete="off"
+                           class="input-clean w-full py-4 px-6 rounded-2xl text-slate-700 font-semibold text-lg">
+                </div>
+                
+                <button onclick="registerPlayer()" class="btn-gradient w-full py-4 rounded-2xl font-bold uppercase tracking-wider shadow-lg active:scale-95 text-sm">
+                    Mulai Bermain
+                </button>
+            </div>
+
+            <div class="mt-8 text-left border-t border-slate-100 pt-4 flex-grow">
+                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Peringkat Teratas</h3>
+                <div id="history-list" class="space-y-2 max-h-32 overflow-y-auto pr-1 text-xs text-slate-500">
+                    <div class="text-xs text-slate-400 italic">Belum ada skor...</div>
+                </div>
+            </div>
+
+            <div class="footer-branding">
+                <p class="dev-tag">© 2025 | Aplikasi dibuat oleh <span class="text-indigo-500">ALFIAN</span></p>
+            </div>
+        </div>
+
+        <!-- Layar Menu Utama -->
+        <div id="menu-screen" class="card-main w-full min-h-[600px] rounded-[3rem] p-10 text-center hidden animate-in fade-in slide-in-from-bottom-10 duration-500">
+            <div class="relative inline-block mb-6">
+                <div class="w-20 h-20 bg-indigo-50 rounded-[2rem] border-4 border-white flex items-center justify-center shadow-md overflow-hidden p-2">
+                    <span id="player-initial" class="text-3xl font-black text-indigo-500">?</span>
+                </div>
+            </div>
+            
+            <h2 id="welcome-text" class="text-2xl font-extrabold mb-1 text-slate-800">Halo!</h2>
+            <p class="text-slate-500 text-xs mb-8 italic">Rasakan energi musiknya!</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-indigo-50/50 p-4 rounded-3xl border border-indigo-100">
+                    <div class="text-[10px] text-indigo-400 font-bold uppercase mb-1">Skor Terbaik</div>
+                    <div id="high-score-display" class="text-2xl font-black text-indigo-600">0</div>
+                </div>
+                <div class="bg-purple-50/50 p-4 rounded-3xl border border-purple-100">
+                    <div class="text-[10px] text-purple-400 font-bold uppercase mb-1">Total Main</div>
+                    <div id="total-play-display" class="text-2xl font-black text-purple-600">0</div>
+                </div>
+            </div>
+
+            <div class="space-y-4 flex-grow">
+                <button onclick="startGame()" class="btn-gradient w-full py-5 rounded-3xl font-bold uppercase tracking-widest shadow-xl text-sm">
+                    Mulai Sekarang
+                </button>
+                <button onclick="backToReg()" class="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-3xl font-bold text-[11px] uppercase tracking-widest transition-all">
+                    Ganti Akun
+                </button>
+            </div>
+
+            <div class="footer-branding">
+                <p class="dev-tag">© 2025 | Aplikasi dibuat oleh <span class="text-indigo-500">ALFIAN</span></p>
+            </div>
+        </div>
+
+        <!-- Layar Permainan (Gameplay) -->
+        <div id="game-screen" class="card-main w-full h-[720px] rounded-[3rem] p-8 hidden animate-in fade-in duration-300 relative">
+            
+            <!-- Header Game -->
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span id="level-indicator" class="px-3 py-1 bg-indigo-100 text-indigo-600 text-[10px] font-black rounded-full uppercase tracking-wider">Level 01</span>
+                    <div id="heart-container" class="flex gap-1.5 mt-2"></div>
+                </div>
+                <div class="text-right flex flex-col items-end">
+                    <span id="current-score" class="text-3xl font-black text-slate-800 leading-none">0</span>
+                    <button id="music-toggle-btn" onclick="manualToggleMusic()" class="mt-2 p-2 bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all hover:bg-white">
+                        <svg id="music-icon" class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path id="music-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="text-center mb-1">
+                <div id="timer-text">15</div>
+                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Sisa Waktu</div>
+            </div>
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+
+            <!-- Pertanyaan -->
+            <div class="flex-grow flex flex-col">
+                <div class="mb-6 min-h-[90px] flex items-center justify-center text-center">
+                    <p id="question-text" class="text-xl font-bold leading-tight text-slate-800"></p>
+                </div>
+                
+                <!-- Opsi Jawaban -->
+                <div id="options-grid" class="grid grid-cols-1 gap-3 mb-6"></div>
+
+                <!-- TOMBOL BANTUAN -->
+                <div class="grid grid-cols-2 gap-3 mt-auto mb-4">
+                    <button id="help-5050" onclick="useHelp5050()" class="btn-help py-3 rounded-2xl flex flex-col items-center justify-center hover:bg-indigo-50 active:scale-95">
+                        <span class="text-[10px] font-black uppercase tracking-tighter">50 : 50</span>
+                        <span id="count-5050" class="text-[9px] font-bold opacity-60">Tersedia: 1</span>
+                    </button>
+                    <button id="help-time" onclick="useHelpTime()" class="btn-help py-3 rounded-2xl flex flex-col items-center justify-center hover:bg-indigo-50 active:scale-95">
+                        <span class="text-[10px] font-black uppercase tracking-tighter">+10 Detik</span>
+                        <span id="count-time" class="text-[9px] font-bold opacity-60">Tersedia: 1</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedback Overlays -->
+            <div id="feedback-correct" class="feedback-overlay correct-state rounded-[3rem]">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4 border-4 border-white">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-2xl font-black mb-2 text-emerald-800 uppercase tracking-tighter">BENAR!</h2>
+                <p id="correct-reason" class="px-8 text-center text-emerald-700 font-semibold italic text-xs"></p>
+            </div>
+
+            <div id="feedback-wrong" class="feedback-overlay wrong-state rounded-[3rem]">
+                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-4 border-4 border-white">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+                <h2 class="text-2xl font-black mb-2 text-rose-800 uppercase tracking-tighter">SALAH!</h2>
+                <p id="wrong-reason" class="px-8 text-center text-rose-700 font-semibold italic text-xs"></p>
+            </div>
+
+            <!-- GAME OVER OVERLAY -->
+            <div id="game-over-screen" class="feedback-overlay game-over-state rounded-[3rem]">
+                <div class="text-center p-8">
+                    <div id="game-over-icon" class="mb-4">
+                         <!-- Akan diisi via JS -->
+                    </div>
+                    <h2 id="game-over-title" class="text-4xl font-black mb-2 uppercase tracking-tighter">GAME OVER</h2>
+                    <p id="game-over-msg" class="text-slate-400 text-sm mb-6"></p>
+                    
+                    <div class="bg-white/10 p-6 rounded-[2rem] border border-white/10 mb-8 backdrop-blur-md">
+                        <div class="text-[10px] text-indigo-300 font-bold uppercase tracking-[0.2em] mb-1">Skor Kamu</div>
+                        <div id="final-score" class="text-5xl font-black text-white">0</div>
+                    </div>
+
+                    <button onclick="closeGameOver()" class="btn-gradient px-12 py-4 rounded-2xl font-bold uppercase tracking-widest shadow-xl text-sm w-full">
+                        Main Lagi
+                    </button>
+                </div>
+            </div>
+
+            <div class="footer-branding pt-2 text-center">
+                <p class="dev-tag">© 2025 | Aplikasi dibuat oleh <span class="text-indigo-500">ALFIAN</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -- AUDIO SYSTEM --
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMusicOn = false; 
+        let instrumentInterval = null;
+
+        function startUpbeatMusic() {
+            if (instrumentInterval) clearInterval(instrumentInterval);
+            
+            const progressions = [
+                [261, 329, 392, 523], // C
+                [349, 440, 523, 698], // F
+                [392, 493, 587, 783], // G
+                [220, 261, 329, 440]  // Am
+            ];
+            
+            let progIdx = 0;
+            let step = 0;
+
+            instrumentInterval = setInterval(() => {
+                if (!isMusicOn) return;
+
+                const freq = progressions[progIdx][step % 4];
+                playTone(freq, 0.04, 0.15, 'square');
+                
+                if (step % 2 === 0) {
+                    playTone(progressions[progIdx][0] / 2, 0.08, 0.3, 'triangle');
+                }
+
+                step++;
+                if (step % 16 === 0) {
+                    progIdx = (progIdx + 1) % progressions.length;
+                }
+            }, 150);
+        }
+
+        function playTone(freq, vol, duration, type = 'square') {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            g.gain.setValueAtTime(0, audioCtx.currentTime);
+            g.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            
+            osc.connect(g);
+            g.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSoundEffect(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g);
+            g.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.1);
+                g.gain.setValueAtTime(0.15, now);
+                g.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start();
+                osc.stop(now + 0.4);
+            } 
+            else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(55, now + 0.3);
+                g.gain.setValueAtTime(0.1, now);
+                g.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start();
+                osc.stop(now + 0.5);
+            } 
+            else if (type === 'help') {
+                osc.frequency.setValueAtTime(880, now);
+                g.gain.setValueAtTime(0.05, now);
+                g.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start();
+                osc.stop(now + 0.3);
+            }
+            else if (type === 'gameover') {
+                // Suara drama kekalahan
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(110, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 1.0);
+                g.gain.setValueAtTime(0.2, now);
+                g.gain.linearRampToValueAtTime(0, now + 1.0);
+                osc.start();
+                osc.stop(now + 1.0);
+            }
+        }
+
+        function setMusicState(active) {
+            isMusicOn = active;
+            const icon = document.getElementById('music-icon');
+            
+            if (isMusicOn) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                icon.classList.add('music-anim');
+                icon.innerHTML = '<path id="music-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>';
+                if (!instrumentInterval) startUpbeatMusic();
+            } else {
+                icon.classList.remove('music-anim');
+                icon.innerHTML = '<path id="music-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>';
+                if (instrumentInterval) {
+                    clearInterval(instrumentInterval);
+                    instrumentInterval = null;
+                }
+            }
+        }
+
+        function manualToggleMusic() {
+            setMusicState(!isMusicOn);
+        }
+
+        // -- GAME LOGIC --
+        const allQuestions = [
+            { q: "Matahari tenggelam di sebelah...", a: "Gawat", o: ["Barat", "Gawat", "Samping", "Laut"], r: "Kalau matahari tenggelam kan gelap gulita, ya gawat dong!" },
+            { q: "Apa yang biasa ditemukan di ujung pelangi?", a: "Huruf i", o: ["Harta kurun", "Bidadari", "Warna", "Huruf i"], r: "Coba lihat kata 'pelangi', diakhiri dengan huruf 'i'." },
+            { q: "Ikan bernapas dengan...", a: "Tenang", o: ["Insang", "Tenang", "Air", "Mulut"], r: "Kalau ikannya panik, nanti tersedak air." },
+            { q: "Supaya lampu menyala kita harus...", a: "Niat", o: ["Pencet", "Niat", "Bayar", "Colok"], r: "Tidak ada niat ya tidak bakal jalan memencet saklarnya!" },
+            { q: "Sebelum sarapan biasanya orang...", a: "Bangun", o: ["Mandi", "Masak", "Makan", "Bangun"], r: "Masa makan sambil tidur? Bangun dulu dong!" },
+            { q: "Jika ada 5 burung lalu 1 ditembak, sisanya...", a: "Kabur", o: ["4", "0", "Kabur", "Mati"], r: "Burung yang kaget dengar suara tembakan pasti kabur!" },
+            { q: "Apa yang dilakukan orang sebelum turun?", a: "Naik", o: ["Berhenti", "Buka pintu", "Naik", "Noleh"], r: "Gimana logikanya mau turun kalau belum naik dulu!" },
+            { q: "Lampu kuning di jalan artinya...", a: "Ngebut", o: ["Hati-hati", "Berhenti", "Ngebut", "Jalan"], r: "Biasanya orang kalau lihat kuning malah makin ngebut!" },
+            { q: "Sepeda motor rodanya...", a: "Berputar", o: ["Dua", "Berputar", "Bundar", "Karet"], r: "Kalau rodanya tidak berputar ya tidak jalan." },
+            { q: "Orang mandi supaya...", a: "Basah", o: ["Bersih", "Wangi", "Basah", "Segar"], r: "Tujuan utamanya air ya bikin basah dulu!" }
+        ];
+
+        let playerName = "";
+        let score = 0;
+        let lives = 3;
+        let currentLevel = 1;
+        let timer = null;
+        let timeLeft = 15.0;
+        let shuffledPool = [];
+        let isAnswering = false;
+        let help5050Count = 1;
+        let helpTimeCount = 1;
+
+        function registerPlayer() {
+            const input = document.getElementById('player-name');
+            const name = input.value.trim();
+            if (name.length < 2) return;
+            playerName = name;
+            
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+            if (!profiles[playerName]) {
+                profiles[playerName] = { highScore: 0, totalPlay: 0 };
+            }
+            localStorage.setItem('profiles', JSON.stringify(profiles));
+
+            updateLeaderboardUI();
+            setMusicState(true);
+            loadProfile();
+        }
+
+        function loadProfile() {
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+            const data = profiles[playerName] || { highScore: 0, totalPlay: 0 };
+            
+            document.getElementById('welcome-text').innerText = `Halo, ${playerName}!`;
+            document.getElementById('player-initial').innerText = playerName.charAt(0).toUpperCase();
+            document.getElementById('high-score-display').innerText = data.highScore;
+            document.getElementById('total-play-display').innerText = data.totalPlay;
+            showScreen('menu-screen');
+        }
+
+        function startGame() {
+            score = 0; lives = 3; currentLevel = 1;
+            help5050Count = 1; helpTimeCount = 1;
+            updateHelpUI();
+            shuffledPool = [...allQuestions].sort(() => Math.random() - 0.5);
+            showScreen('game-screen');
+            setMusicState(true);
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentLevel > 10) { triggerGameOver(true); return; }
+            isAnswering = false;
+            const q = shuffledPool[currentLevel - 1];
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('current-score').innerText = score;
+            document.getElementById('level-indicator').innerText = `Level ${currentLevel.toString().padStart(2, '0')}`;
+            updateHearts();
+            
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            [...q.o].sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card w-full py-4 px-6 rounded-2xl font-bold text-slate-700 text-sm text-left active:scale-95';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, q);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('help-5050').disabled = help5050Count <= 0;
+            document.getElementById('help-time').disabled = helpTimeCount <= 0;
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 15.0;
+            const bar = document.getElementById('timer-bar');
+            const text = document.getElementById('timer-text');
+            
+            timer = setInterval(() => {
+                timeLeft -= 0.1;
+                bar.style.width = Math.max(0, (timeLeft / 15 * 100)) + "%";
+                text.innerText = Math.max(0, Math.ceil(timeLeft));
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    checkAnswer('WAKTU_HABIS', { a: '?', r: "Yah! Waktunya habis. Fokus ya!" });
+                }
+            }, 100);
+        }
+
+        function checkAnswer(choice, q) {
+            if (isAnswering) return;
+            isAnswering = true;
+            clearInterval(timer);
+            
+            if (choice === q.a) {
+                playSoundEffect('correct');
+                score += 100;
+                showFeedback('correct', q.r);
+            } else {
+                playSoundEffect('wrong');
+                lives--;
+                showFeedback('wrong', q.r || "Ups! Jangan kelamaan mikir.");
+            }
+        }
+
+        function showFeedback(type, reason) {
+            const overlay = document.getElementById(`feedback-${type}`);
+            document.getElementById(`${type}-reason`).innerText = reason;
+            overlay.classList.add('feedback-active');
+            setTimeout(() => {
+                overlay.classList.remove('feedback-active');
+                if (lives <= 0) {
+                    triggerGameOver(false);
+                } else if (isAnswering) {
+                    currentLevel++;
+                    loadQuestion();
+                }
+            }, 2500);
+        }
+
+        function updateHearts() {
+            const container = document.getElementById('heart-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const color = i < lives ? 'text-rose-500' : 'text-slate-200';
+                container.innerHTML += `<svg class="w-4 h-4 ${color}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+            }
+        }
+
+        function triggerGameOver(win) {
+            setMusicState(false);
+            clearInterval(timer);
+            
+            // Simpan data
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+            if (playerName && profiles[playerName]) {
+                profiles[playerName].totalPlay = (profiles[playerName].totalPlay || 0) + 1;
+                if (score > (profiles[playerName].highScore || 0)) {
+                    profiles[playerName].highScore = score;
+                }
+                localStorage.setItem('profiles', JSON.stringify(profiles));
+            }
+
+            // UI Game Over
+            const overlay = document.getElementById('game-over-screen');
+            const title = document.getElementById('game-over-title');
+            const msg = document.getElementById('game-over-msg');
+            const iconContainer = document.getElementById('game-over-icon');
+            const finalScoreElem = document.getElementById('final-score');
+
+            finalScoreElem.innerText = score;
+
+            if (win) {
+                title.innerText = "YESS! MENANG";
+                title.className = "text-4xl font-black mb-2 uppercase tracking-tighter text-emerald-400";
+                msg.innerText = "Logika kamu memang luar biasa, jenius!";
+                iconContainer.innerHTML = '<div class="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-500/30 text-emerald-400"><svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>';
+            } else {
+                playSoundEffect('gameover');
+                title.innerText = "GAME OVER";
+                title.className = "text-4xl font-black mb-2 uppercase tracking-tighter text-rose-500";
+                msg.innerText = "Yah, nyawa kamu habis. Coba lagi ya!";
+                iconContainer.innerHTML = '<div class="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto border-4 border-rose-500/30 text-rose-500"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>';
+            }
+
+            overlay.classList.add('feedback-active');
+        }
+
+        function closeGameOver() {
+            document.getElementById('game-over-screen').classList.remove('feedback-active');
+            loadProfile();
+            updateLeaderboardUI();
+        }
+
+        function useHelp5050() {
+            if (help5050Count <= 0 || isAnswering) return;
+            playSoundEffect('help');
+            help5050Count--;
+            updateHelpUI();
+            const q = shuffledPool[currentLevel - 1];
+            const buttons = Array.from(document.querySelectorAll('.option-card'));
+            const wrongButtons = buttons.filter(btn => btn.innerText !== q.a);
+            const toHide = wrongButtons.sort(() => Math.random() - 0.5).slice(0, 2);
+            toHide.forEach(btn => btn.classList.add('hidden-opt'));
+            document.getElementById('help-5050').disabled = true;
+        }
+
+        function useHelpTime() {
+            if (helpTimeCount <= 0 || isAnswering) return;
+            playSoundEffect('help');
+            helpTimeCount--;
+            updateHelpUI();
+            timeLeft += 10;
+            document.getElementById('help-time').disabled = true;
+        }
+
+        function updateHelpUI() {
+            document.getElementById('count-5050').innerText = `Tersedia: ${help5050Count}`;
+            document.getElementById('count-time').innerText = `Tersedia: ${helpTimeCount}`;
+        }
+
+        function updateLeaderboardUI() {
+            const list = document.getElementById('history-list');
+            const profiles = JSON.parse(localStorage.getItem('profiles') || '{}');
+            const sorted = Object.entries(profiles)
+                .map(([name, data]) => ({ name, ...data }))
+                .sort((a, b) => b.highScore - a.highScore)
+                .slice(0, 5);
+
+            if (sorted.length === 0) {
+                list.innerHTML = '<div class="text-xs text-slate-400 italic">Belum ada skor...</div>';
+                return;
+            }
+
+            list.innerHTML = sorted.map((p, i) => `
+                <div class="flex justify-between items-center py-1 border-b border-slate-50">
+                    <span class="font-bold">${i + 1}. ${p.name}</span>
+                    <span class="text-indigo-600 font-black">${p.highScore}</span>
+                </div>
+            `).join('');
+        }
+
+        function showScreen(id) {
+            ['reg-screen', 'menu-screen', 'game-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+        
+        function backToReg() { showScreen('reg-screen'); }
+
+        // Init Leaderboard on load
+        updateLeaderboardUI();
+    </script>
+</body>
+</html>
